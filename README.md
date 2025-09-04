@@ -72,4 +72,5 @@ MIT
 
 ## Credit
 
+Made by [knightsri](https://github.com/knightsri).
 Star or PR welcome if this helped you!
