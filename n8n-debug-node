@@ -1,0 +1,31 @@
+{
+  "name": "n8n-debug-node",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "/**\n * Walks through the data and classifies all paths by their top-level branch:\n * \"$item(0).json.*\" → paths.json\n * \"$item(0).binary.*\" → paths.binary\n * all other scalar leaf paths → paths.misc\n */\nfunction walkAndCategorize(data, path, paths) {\n  if (typeof data !== 'object' || data === null) {\n    // Classify by path prefix\n    if (path.startsWith('$item(') && path.includes(').json.')) {\n      paths.json.push(path);\n    } else if (path.startsWith('$item(') && path.includes(').binary.')) {\n      paths.binary.push(path);\n    } else {\n      paths.misc.push(path);\n    }\n    return;\n  }\n  if (Array.isArray(data)) {\n    data.forEach((item, index) => {\n      walkAndCategorize(item, `${path}[${index}]`, paths);\n    });\n    return;\n  }\n  Object.keys(data).forEach(key => {\n    walkAndCategorize(data[key], `${path}.${key}`, paths);\n  });\n}\n\nconst items = $input.all();\nconst debugItems = [];\n\nitems.forEach((item, index) => {\n  const paths = { json: [], binary: [], misc: [] };\n  let mainKeyValue = (item.json && (item.json.name || item.json.id));\n  if (!mainKeyValue) mainKeyValue = `Item-${index}`;\n  const debugKey = `DEBUG-INFO-${mainKeyValue}`;\n  const itemPath = `$item(${index})`;\n\n  // Walk only json and binary fields\n  if (item.json) walkAndCategorize(item.json, `${itemPath}.json`, paths);\n  if (item.binary) walkAndCategorize(item.binary, `${itemPath}.binary`, paths);\n  // Other top-level fields (like pairedItem)\n  Object.keys(item).forEach(key => {\n    if (key !== 'json' && key !== 'binary') {\n      paths.misc.push(`${itemPath}.${key}`);\n    }\n  });\n\n  const debugItem = {\n    json: {\n      [debugKey]: {\n        json: paths.json,\n        binary: paths.binary,\n        'misc': paths.misc\n      }\n    },\n    binary: item.binary\n  };\n  debugItems.push(debugItem);\n});\n\nreturn debugItems.concat(items);\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        160
+      ],
+      "id": "4974bcee-a2e9-4e0d-bc87-6e90b5fe5fd8",
+      "name": "DEBUG-Node",
+      "alwaysOutputData": false
+    }
+  ],
+  "pinData": {},
+  "connections": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "612d5931-17b6-4b5e-aea1-6aca74847312",
+  "meta": {
+    "instanceId": "3fa95e53ce4689656a60a00b8b225ad7c766d306fb38f34a522060dd31fd5be5"
+  },
+  "id": "Xkh17lhNF91NZvaQ",
+  "tags": []
+}
