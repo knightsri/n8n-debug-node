@@ -14,7 +14,7 @@ A plug-and-play **DEBUG Code node** for [n8n](https://n8n.io) that shows the **r
 
 ## 🚀 Quick Start
 
-1. Download [`Download n8n-debug-node.json`](./n8n-debug-node.json) from this repo.
+1. Download [`n8n-debug-node.json`](./n8n-debug-node.json) from this repo.
 2. Import into your n8n (Workflows > Import > File).
 3. Open workflow, copy the DEBUG-node, and paste it into any workflow.
 4. Connect DEBUG-node after any node—you’ll see all available runtime item paths.
